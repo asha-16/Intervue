@@ -19,6 +19,7 @@
     "inngest": "^3.44.3",
     "intervue": "file:..",
     "mongoose": "^8.19.1",
+    "resend": "^6.5.2",
     "stream-chat": "^9.24.0"
   },
   "devDependencies": {
