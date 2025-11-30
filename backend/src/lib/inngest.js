@@ -2,6 +2,8 @@ import { Inngest } from "inngest";
 import { connectDB } from "./db.js";
 import User from "../models/User.js";
 import { deleteStreamUser, upsertStreamUser } from "./stream.js";
+import { sendWelcomeEmail } from "../lib/email.js";
+
 
 export const inngest = new Inngest( { id: "intervue"});
 
@@ -27,6 +29,9 @@ const syncUser = inngest.createFunction(
             name: newUser.name,
             image: newUser.profileImage,
         });
+
+        //challenge: send a welcome email here
+        await sendWelcomeEmail(newUser.email, newUser.name);
     }
 );
 
