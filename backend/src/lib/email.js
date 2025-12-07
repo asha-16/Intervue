@@ -21,7 +21,7 @@ export async function sendWelcomeEmail(to, name) {
               </p>
 
               <div style="text-align: center; margin: 30px 0;">
-                <a href="https://your-frontend-domain.com"
+                <a href="https://intervue-frontend.onrender.com"
                   style="background-color: #4f46e5; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-size: 16px;">
                   Get Started
                 </a>
