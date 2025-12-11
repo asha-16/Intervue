@@ -1,8 +1,8 @@
 import express from "express";
-import path from 'path';
+import path from "path";
 import cors from "cors";
 
-import { clerkMiddleware } from '@clerk/express';
+import { clerkMiddleware } from "@clerk/express";
 import { serve } from "inngest/express";
 import { inngest, functions } from "./lib/inngest.js";
 import { ENV } from "./lib/env.js";
@@ -14,42 +14,63 @@ const app = express();
 
 const __dirname = path.resolve();
 
-//middleware
+// ------------------------
+// CORS CONFIG 
+// ------------------------
+const allowedOrigins = [
+  "http://localhost:5173",      // local frontend
+  ENV.CLIENT_URL,               // deployed frontend
+];
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Allow same-origin requests like server-to-server or mobile apps
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error("Not allowed by CORS"));
+    },
+    credentials: true,
+  })
+);
+// ------------------------
+// END OF FIX
+// ------------------------
+
+// Middleware
 app.use(express.json());
-app.use(cors(
-    {origin:ENV.CLIENT_URL, credentials:true}
-));
-app.use(clerkMiddleware());  //this adds auth field to request object
+app.use(clerkMiddleware()); // Adds auth info to req.user
 
+// API routes
 app.use("/api/inngest", serve({ client: inngest, functions }));
-app.use("/api/chat", chatRoutes)
-app.use("/api/sessions", sessionRoutes);;
+app.use("/api/chat", chatRoutes);
+app.use("/api/sessions", sessionRoutes);
 
-//routes
-app.get("/books", (req, res) => {
-    res.status(200).send({message: "server is up and running"})
+// Test route
+app.get("/", (req, res) => {
+  res.status(200).send({ message: "server is up and running" });
 });
 
+// Serve frontend in production
+if (ENV.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "../frontend/dist")));
 
-//make our app ready for deployment
-if(ENV.NODE_ENV === 'production') {
-    app.use(express.static(path.join(__dirname, "../frontend/dist")));
-
-    app.get("/{*any}", (req, res) => {
-        res.sendFile(path.join(__dirname, "../frontend", "dist", "index.html"));
-    });
+  app.get("/*", (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend", "dist", "index.html"));
+  });
 }
 
-
+// Start server
 const startServer = async () => {
-    try {
-        await connectDB();
-        app.listen(ENV.PORT, () => {
-            console.log(`Server is running on port ${ENV.PORT}`);
-        });
-    } catch (error) {
-        console.error("💣 Error Starting the server", error);
-    }
-}
+  try {
+    await connectDB();
+    app.listen(ENV.PORT, () => {
+      console.log(`Server is running on port ${ENV.PORT}`);
+    });
+  } catch (error) {
+    console.error("💣 Error starting the server", error);
+  }
+};
 
 startServer();
