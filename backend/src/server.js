@@ -17,26 +17,16 @@ const __dirname = path.resolve();
 // ------------------------
 // CORS CONFIG 
 // ------------------------
-const allowedOrigins = [
-  "http://localhost:5173",      // local frontend
-  ENV.CLIENT_URL,               // deployed frontend
-];
-
 app.use(
   cors({
-    origin: (origin, callback) => {
-      // Allow same-origin requests like server-to-server or mobile apps
-      if (!origin || allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
-      return callback(new Error("Not allowed by CORS"));
-    },
+    origin: [
+      "http://localhost:5173",
+      ENV.CLIENT_URL
+    ],
     credentials: true,
   })
 );
-// ------------------------
-// END OF FIX
-// ------------------------
+
 
 // Middleware
 app.use(express.json());
