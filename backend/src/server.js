@@ -40,6 +40,16 @@ app.use(
 app.use(express.json());
 app.use(clerkMiddleware()); // Adds auth info to req.user
 
+app.get("/debug-auth", (req, res) => {
+  console.log("DEBUG route - req.user:", req.user);
+  res.json({
+    userFromMiddleware: req.user || null,
+    authHeader: req.headers.authorization || null,
+    cookies: req.headers.cookie || null
+  });
+});
+
+
 // API routes
 app.use("/api/inngest", serve({ client: inngest, functions }));
 app.use("/api/chat", chatRoutes);
