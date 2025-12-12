@@ -1,6 +1,7 @@
 import express from "express";
 import path from "path";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 
 import { clerkMiddleware } from "@clerk/express";
 import { serve } from "inngest/express";
@@ -10,6 +11,7 @@ import { connectDB } from "./lib/db.js";
 import sessionRoutes from "./routes/sessionRoute.js";
 import chatRoutes from "./routes/chatRoutes.js";
 
+
 const app = express();
 
 const __dirname = path.resolve();
@@ -17,13 +19,19 @@ const __dirname = path.resolve();
 // ------------------------
 // CORS CONFIG 
 // ------------------------
+const allowedOrigins = [
+  "http://localhost:5173",                      // local dev
+  "https://intervue-frontend.onrender.com",     // deployed frontend
+];
+
+// Use cookie-parser BEFORE Clerk middleware so cookies are available
+app.use(cookieParser());
+
+// Simple, reliable CORS config for production (no callback)
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173",
-      ENV.CLIENT_URL
-    ],
-    credentials: true,
+    origin: allowedOrigins,
+    credentials: true, // <--- important: allows cookies to be sent
   })
 );
 

@@ -13,7 +13,7 @@ function ProblemDescription({ problem, currentProblemId, onProblemChange, allPro
         <p className="text-base-content/60">{problem.category}</p>
 
         {/* Problem selector */}
-        <div className="mt-4"> 
+        <div className="mt-4">
           <select
             className="select select-sm w-full"
             value={currentProblemId}

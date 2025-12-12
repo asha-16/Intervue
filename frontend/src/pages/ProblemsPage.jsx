@@ -68,7 +68,7 @@ function ProblemsPage() {
         {/* STATS FOOTER */}
         <div className="mt-12 card bg-base-100 shadow-lg">
           <div className="card-body">
-            <div className="stats stats-horizontal lg:stats-horizontal">
+            <div className="stats stats-vertical lg:stats-horizontal">
               <div className="stat">
                 <div className="stat-title">Total Problems</div>
                 <div className="stat-value text-primary">{problems.length}</div>
