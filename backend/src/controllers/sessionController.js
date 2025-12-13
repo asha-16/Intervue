@@ -3,7 +3,6 @@ import Session from "../models/Session.js";
 
 export async function createSession(req, res) {
   try {
-    console.log("DEBUG createSession - req.user:", req.user);
     const { problem, difficulty } = req.body;
     const userId = req.user._id;
     const clerkId = req.user.clerkId;
