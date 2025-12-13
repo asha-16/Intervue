@@ -12,12 +12,12 @@ import chatRoutes from "./routes/chatRoutes.js";
 import sessionRoutes from "./routes/sessionRoute.js";
 
 const app = express();
+
 const __dirname = path.resolve();
 
-/* ======================================================
-   1️⃣ Body parsing middleware
-====================================================== */
+// middleware
 app.use(express.json());
+
 
 /* ======================================================
    2️⃣ CORS CONFIG (FIXED)
@@ -52,50 +52,29 @@ app.use(
   })
 );
 
-/* ======================================================
-   3️⃣ Authentication middleware (Clerk)
-====================================================== */
-app.use(clerkMiddleware()); // adds req.auth
+app.use(clerkMiddleware()); // this adds auth field to request object: req.auth()
 
-/* ======================================================
-   4️⃣ Routes
-====================================================== */
 app.use("/api/inngest", serve({ client: inngest, functions }));
 app.use("/api/chat", chatRoutes);
 app.use("/api/sessions", sessionRoutes);
 
-/* ======================================================
-   5️⃣ Health check
-====================================================== */
-app.get("/", (req, res) => {
+app.get("/health", (req, res) => {
   res.status(200).json({ msg: "api is up and running" });
 });
 
-/* ======================================================
-   6️⃣ Serve frontend in production
-====================================================== */
+// make our app ready for deployment
 if (ENV.NODE_ENV === "production") {
-  const distPath = path.join(__dirname, "../frontend/dist");
+  app.use(express.static(path.join(__dirname, "../frontend/dist")));
 
-  // serve static assets
-  app.use(express.static(distPath));
-
-  // SPA fallback — MUST be app.use (NOT app.get)
-  app.use((req, res) => {
-    res.sendFile(path.join(distPath, "index.html"));
+  app.get("/{*any}", (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend", "dist", "index.html"));
   });
 }
 
-
-/* ======================================================
-   7️⃣ Start server
-====================================================== */
 const startServer = async () => {
   try {
     await connectDB();
-    app.listen(ENV.PORT, () =>
-      console.log("🚀 Server running on port:", ENV.PORT)
-    );
+    app.listen(ENV.PORT, () => console.log("Server is running on port:", ENV.PORT));
   } catch (error) {
     console.error("💥 Error starting the server", error);
   }
