@@ -75,14 +75,17 @@ app.get("/", (req, res) => {
    6️⃣ Serve frontend in production
 ====================================================== */
 if (ENV.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "../frontend/dist")));
+  const distPath = path.join(__dirname, "../frontend/dist");
 
-  app.get("/*", (req, res) => {
-    res.sendFile(
-      path.join(__dirname, "../frontend/dist", "index.html")
-    );
+  // serve static assets
+  app.use(express.static(distPath));
+
+  // SPA fallback — MUST be app.use (NOT app.get)
+  app.use((req, res) => {
+    res.sendFile(path.join(distPath, "index.html"));
   });
 }
+
 
 /* ======================================================
    7️⃣ Start server
