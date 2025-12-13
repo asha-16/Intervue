@@ -7,14 +7,24 @@ export const protectRoute = [
     try {
       const clerkId = req.auth().userId;
 
-      if (!clerkId) return res.status(401).json({ message: "Unauthorized - invalid token" });
+      if (!clerkId) {
+        return res.status(401).json({ message: "Unauthorized - invalid token" });
+      }
 
-      // find user in db by clerk ID
-      const user = await User.findOne({ clerkId });
+      // find user in db
+      let user = await User.findOne({ clerkId });
 
-      if (!user) return res.status(404).json({ message: "User not found" });
+      // ✅ AUTO-CREATE USER IF NOT FOUND (FIX)
+      if (!user) {
+        user = await User.create({
+          clerkId,
+          email: req.auth().sessionClaims?.email,
+          name: req.auth().sessionClaims?.name || "New User",
+          profileImage: req.auth().sessionClaims?.picture,
+        });
+      }
 
-      // attach user to req
+      // attach user to request
       req.user = user;
 
       next();
